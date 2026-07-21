@@ -12,6 +12,7 @@ const REQUIRED_SKILLS = [
   'moderation.bulk_delete_messages',
   'moderation.create_role',
   'moderation.edit_role',
+  'moderation.set_role_permissions',
   'moderation.delete_role',
   'moderation.add_role_to_member',
   'moderation.remove_role_from_member',

@@ -69,13 +69,14 @@ TERMINAL_CWD=./workspace
 
 Igen works on its own with Node.js and Discord, but it is easier to improve over time with an agentic coding tool such as Hermes Agent, OpenClaw, Claude Code, Codex, or another terminal-capable assistant.
 
-The repo includes a Markdown skill for that workflow:
+The repo includes Markdown skills for that workflow:
 
 ```text
 agent-skills/igen-ai-discord-assistant-integration/SKILL.md
+agent-skills/igen-ai-discord-skill-authoring/SKILL.md
 ```
 
-Give that file to Hermes/OpenClaw-style agents when asking them to extend the bot. It tells the agent to keep the design data-driven: add moderation actions as YAML skills, improve generic runtime code only when needed, run tests, and avoid per-action command files like `kick.js` or `ban.js`.
+Give those files to Hermes/OpenClaw-style agents when asking them to extend the bot. The integration skill explains the repo structure. The skill-authoring skill explains how an agent should read official Discord docs, add or patch YAML skills, run tests, and avoid per-action command files like `kick.js` or `ban.js`.
 
 This integration is optional. You do not need Hermes or OpenClaw to run the bot.
 
@@ -116,8 +117,11 @@ Good additions:
 
 - `moderation.add_role`
 - `moderation.remove_role`
+- `moderation.set_role_permissions`
 - `moderation.bulk_delete_messages`
 - `moderation.prune_members`
+
+For missing Discord actions, use `agent-skills/igen-ai-discord-skill-authoring/SKILL.md`: check existing skills, read the official Discord docs, add or patch the matching YAML file, run tests, then reload/restart before execution.
 
 If a new feature cannot be expressed with the current YAML shape, improve the generic runtime first, then encode the feature as a skill.
 

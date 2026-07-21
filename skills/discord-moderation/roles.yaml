@@ -102,6 +102,42 @@ skills:
       mentionable: '{{ mentionable }}'
     success_status:
     - 200
+- name: moderation.set_role_permissions
+  description: Set a Discord role's full permissions bitfield. Use only after calculating
+    the exact final permissions string.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - roleId
+    - permissions
+    - reason
+    properties:
+      guildId:
+        type: string
+      roleId:
+        type: string
+      permissions:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - ManageRoles
+    bot:
+    - ManageRoles
+  safety:
+    hierarchy: target_role
+    confirmation_required: true
+    dangerous_permissions_require_confirmation: true
+  discord:
+    method: PATCH
+    endpoint: /guilds/{guildId}/roles/{roleId}
+    audit_log_reason: '{{ reason }}'
+    body:
+      permissions: '{{ permissions }}'
+    success_status:
+    - 200
 - name: moderation.delete_role
   description: Delete a Discord role by ID.
   input_schema:
