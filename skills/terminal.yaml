@@ -1,0 +1,13 @@
+skills:
+  - name: terminal.run
+    description: Run a shell command in the configured workspace. Use only when the user asks for host/file/log/process work, never for Discord moderation.
+    input_schema:
+      type: object
+      required: [command, reason]
+      properties:
+        command: { type: string }
+        reason: { type: string }
+    safety:
+      confirmation_required: true
+    terminal:
+      command: "{{ command }}"
