@@ -40,7 +40,7 @@ There are no `kick.js`, `timeout.js`, or per-action command files. Moderation ac
 ```bash
 npm install
 cp .env.example .env
-# edit .env with your Discord bot token and model API key
+# edit .env with your Discord bot token and at least one model provider API key
 npm start
 ```
 
@@ -53,17 +53,52 @@ Required Discord bot intents:
 
 ## Environment
 
+Igen supports five providers:
+
+- OpenAI
+- Gemini
+- Claude / Anthropic
+- OpenRouter
+- AgentRouter
+
+Configure one or more provider blocks in `.env`. Each configured provider needs an API key and model name. Optional base URL variables default to the official/compatible endpoints shown in `.env.example`.
+
 ```env
 DISCORD_BOT_TOKEN=replace_with_discord_bot_token
-MODEL_API_KEY=replace_with_model_api_key
-MODEL_BASE_URL=https://api.openai.com/v1
-MODEL_NAME=gpt-4o-mini
+
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-4o-mini
+
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.0-flash
+
+CLAUDE_API_KEY=
+CLAUDE_MODEL=claude-3-5-haiku-latest
+
+OPENROUTER_API_KEY=
+OPENROUTER_MODEL=openai/gpt-4o-mini
+
+AGENTROUTER_API_KEY=
+AGENTROUTER_MODEL=your_agentrouter_model
+
 SKILLS_DIR=./skills
 TERMINAL_MODE=off
 TERMINAL_CWD=./workspace
 ```
 
-`MODEL_BASE_URL` can point to any OpenAI-compatible provider.
+### Provider priority and fallback
+
+The literal position of each `*_API_KEY=` line in `.env` controls priority:
+
+1. The first non-empty API key from the top is tried first.
+2. If its request fails, Igen tries the next non-empty API key below it.
+3. Blank API keys are skipped.
+
+For example, move `GEMINI_API_KEY=` above `OPENAI_API_KEY=` to make Gemini the primary provider. You may move the complete provider blocks to keep the file readable.
+
+When keys are injected by Docker or the host and no `.env` ordering is available, the fallback order is OpenAI, Gemini, Claude, OpenRouter, then AgentRouter.
+
+Gemini uses Google's OpenAI-compatible endpoint. Claude uses Anthropic's native Messages API. OpenAI, OpenRouter, and AgentRouter use OpenAI-compatible chat-completion requests.
 
 ## Optional Agentic Tool Integration
 

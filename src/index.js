@@ -4,7 +4,8 @@ import { mkdir } from 'node:fs/promises';
 
 import { DiscordRestClient } from './discord/restClient.js';
 import { PermissionChecker } from './discord/permissions.js';
-import { OpenAICompatibleClient } from './llm/client.js';
+import { readEnvSource } from './config/envSource.js';
+import { MultiProviderLLMClient, buildProviderConfigs } from './llm/client.js';
 import { ToolLoop } from './llm/toolLoop.js';
 import { loadSkillsFromDir } from './runtime/skillLoader.js';
 import { SkillExecutor } from './runtime/skillExecutor.js';
@@ -12,9 +13,7 @@ import { TerminalExecutor } from './terminal/executor.js';
 
 const config = {
   discordToken: process.env.DISCORD_BOT_TOKEN,
-  modelApiKey: process.env.MODEL_API_KEY,
-  modelBaseUrl: process.env.MODEL_BASE_URL,
-  modelName: process.env.MODEL_NAME ?? 'gpt-4o-mini',
+  providers: buildProviderConfigs(process.env, readEnvSource()),
   skillsDir: process.env.SKILLS_DIR ?? './skills',
   terminalMode: process.env.TERMINAL_MODE ?? 'off',
   terminalCwd: process.env.TERMINAL_CWD ?? './workspace',
@@ -27,11 +26,7 @@ const discordRest = new DiscordRestClient({ token: config.discordToken });
 const permissionChecker = new PermissionChecker();
 const terminalExecutor = new TerminalExecutor({ cwd: config.terminalCwd, mode: config.terminalMode });
 const skillExecutor = new SkillExecutor({ registry, permissionChecker, discordRest, terminalExecutor });
-const llm = new OpenAICompatibleClient({
-  apiKey: config.modelApiKey,
-  baseUrl: config.modelBaseUrl,
-  model: config.modelName,
-});
+const llm = new MultiProviderLLMClient({ providers: config.providers });
 const toolLoop = new ToolLoop({ llm, skillExecutor, registry });
 
 const client = new Client({
