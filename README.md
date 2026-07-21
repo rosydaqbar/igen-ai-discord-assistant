@@ -2,6 +2,8 @@
 
 Igen AI Discord Assistant is a small adaptive Discord bot runtime. It is built around data-driven skills instead of hardcoded moderation command files.
 
+It works as a standalone bot, and it can also be paired with agentic coding tools such as Hermes Agent or OpenClaw. That integration is optional; when used, it should happen through the repository's Markdown integration skill, not by adding special-case command files.
+
 The name comes from Japanese-ish "wisdom" energy: the bot should learn/adapt by changing skills and runtime behavior, not by adding one-off command scripts forever.
 
 ## What It Does
@@ -62,6 +64,20 @@ TERMINAL_CWD=./workspace
 ```
 
 `MODEL_BASE_URL` can point to any OpenAI-compatible provider.
+
+## Optional Agentic Tool Integration
+
+Igen works on its own with Node.js and Discord, but it is easier to improve over time with an agentic coding tool such as Hermes Agent, OpenClaw, Claude Code, Codex, or another terminal-capable assistant.
+
+The repo includes a Markdown skill for that workflow:
+
+```text
+agent-skills/igen-ai-discord-assistant-integration/SKILL.md
+```
+
+Give that file to Hermes/OpenClaw-style agents when asking them to extend the bot. It tells the agent to keep the design data-driven: add moderation actions as YAML skills, improve generic runtime code only when needed, run tests, and avoid per-action command files like `kick.js` or `ban.js`.
+
+This integration is optional. You do not need Hermes or OpenClaw to run the bot.
 
 ## Skill Example
 
