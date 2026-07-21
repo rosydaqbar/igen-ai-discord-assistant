@@ -12,6 +12,24 @@ skills:
       endpoint: /guilds/{guildId}/members/{targetUserId}
       success_status: [200]
 
+  - name: moderation.list_bans
+    description: List banned users in a guild, optionally paginated around a user ID.
+    input_schema:
+      type: object
+      required: [guildId, limit]
+      properties:
+        guildId: { type: string }
+        limit: { type: integer, minimum: 1, maximum: 1000 }
+        before: { type: string }
+        after: { type: string }
+    permissions:
+      user: [BanMembers]
+      bot: [BanMembers]
+    discord:
+      method: GET
+      endpoint: /guilds/{guildId}/bans?limit={limit}&before={before}&after={after}
+      success_status: [200]
+
   - name: moderation.timeout
     description: Timeout a Discord member for a duration in seconds.
     input_schema:
@@ -143,3 +161,377 @@ skills:
       endpoint: /channels/{channelId}/messages/{messageId}
       audit_log_reason: "{{ reason }}"
       success_status: [204]
+
+  - name: moderation.bulk_delete_messages
+    description: Bulk delete 2 to 100 Discord messages from a channel by exact message IDs.
+    input_schema:
+      type: object
+      required: [channelId, messageIds, reason]
+      properties:
+        channelId: { type: string }
+        messageIds:
+          type: array
+          minItems: 2
+          maxItems: 100
+          items: { type: string }
+        reason: { type: string }
+    permissions:
+      user: [ManageMessages]
+      bot: [ManageMessages]
+    safety:
+      confirmation_required: true
+      limitations:
+        - Discord rejects bulk deletion for messages older than 14 days.
+    discord:
+      method: POST
+      endpoint: /channels/{channelId}/messages/bulk-delete
+      audit_log_reason: "{{ reason }}"
+      body:
+        messages: "{{ messageIds }}"
+      success_status: [204]
+
+  - name: moderation.create_role
+    description: Create a Discord role with explicit permission/color/visibility fields.
+    input_schema:
+      type: object
+      required: [guildId, name, permissions, color, hoist, mentionable, reason]
+      properties:
+        guildId: { type: string }
+        name: { type: string }
+        permissions: { type: string }
+        color: { type: integer, minimum: 0, maximum: 16777215 }
+        hoist: { type: boolean }
+        mentionable: { type: boolean }
+        reason: { type: string }
+    permissions:
+      user: [ManageRoles]
+      bot: [ManageRoles]
+    safety:
+      confirmation_required: true
+      dangerous_permissions_require_confirmation: true
+    discord:
+      method: POST
+      endpoint: /guilds/{guildId}/roles
+      audit_log_reason: "{{ reason }}"
+      body:
+        name: "{{ name }}"
+        permissions: "{{ permissions }}"
+        color: "{{ color }}"
+        hoist: "{{ hoist }}"
+        mentionable: "{{ mentionable }}"
+      success_status: [200]
+
+  - name: moderation.edit_role
+    description: Edit a Discord role. Include exact final role fields only after the user specifies them.
+    input_schema:
+      type: object
+      required: [guildId, roleId, name, permissions, color, hoist, mentionable, reason]
+      properties:
+        guildId: { type: string }
+        roleId: { type: string }
+        name: { type: string }
+        permissions: { type: string }
+        color: { type: integer, minimum: 0, maximum: 16777215 }
+        hoist: { type: boolean }
+        mentionable: { type: boolean }
+        reason: { type: string }
+    permissions:
+      user: [ManageRoles]
+      bot: [ManageRoles]
+    safety:
+      hierarchy: target_role
+      confirmation_required: true
+      dangerous_permissions_require_confirmation: true
+    discord:
+      method: PATCH
+      endpoint: /guilds/{guildId}/roles/{roleId}
+      audit_log_reason: "{{ reason }}"
+      body:
+        name: "{{ name }}"
+        permissions: "{{ permissions }}"
+        color: "{{ color }}"
+        hoist: "{{ hoist }}"
+        mentionable: "{{ mentionable }}"
+      success_status: [200]
+
+  - name: moderation.delete_role
+    description: Delete a Discord role by ID.
+    input_schema:
+      type: object
+      required: [guildId, roleId, reason]
+      properties:
+        guildId: { type: string }
+        roleId: { type: string }
+        reason: { type: string }
+    permissions:
+      user: [ManageRoles]
+      bot: [ManageRoles]
+    safety:
+      hierarchy: target_role
+      confirmation_required: true
+    discord:
+      method: DELETE
+      endpoint: /guilds/{guildId}/roles/{roleId}
+      audit_log_reason: "{{ reason }}"
+      success_status: [204]
+
+  - name: moderation.add_role_to_member
+    description: Add a role to a Discord guild member.
+    input_schema:
+      type: object
+      required: [guildId, targetUserId, roleId, reason]
+      properties:
+        guildId: { type: string }
+        targetUserId: { type: string }
+        roleId: { type: string }
+        reason: { type: string }
+    permissions:
+      user: [ManageRoles]
+      bot: [ManageRoles]
+    safety:
+      hierarchy: target_role
+      confirmation_required: false
+    discord:
+      method: PUT
+      endpoint: /guilds/{guildId}/members/{targetUserId}/roles/{roleId}
+      audit_log_reason: "{{ reason }}"
+      success_status: [204]
+
+  - name: moderation.remove_role_from_member
+    description: Remove a role from a Discord guild member.
+    input_schema:
+      type: object
+      required: [guildId, targetUserId, roleId, reason]
+      properties:
+        guildId: { type: string }
+        targetUserId: { type: string }
+        roleId: { type: string }
+        reason: { type: string }
+    permissions:
+      user: [ManageRoles]
+      bot: [ManageRoles]
+    safety:
+      hierarchy: target_role
+      confirmation_required: false
+    discord:
+      method: DELETE
+      endpoint: /guilds/{guildId}/members/{targetUserId}/roles/{roleId}
+      audit_log_reason: "{{ reason }}"
+      success_status: [204]
+
+  - name: moderation.create_channel
+    description: Create a guild channel. Type follows Discord channel type integers.
+    input_schema:
+      type: object
+      required: [guildId, name, type, reason]
+      properties:
+        guildId: { type: string }
+        name: { type: string }
+        type: { type: integer, minimum: 0 }
+        parentId: { type: string }
+        topic: { type: string }
+        nsfw: { type: boolean }
+        rateLimitPerUser: { type: integer, minimum: 0, maximum: 21600 }
+        reason: { type: string }
+    permissions:
+      user: [ManageChannels]
+      bot: [ManageChannels]
+    safety:
+      confirmation_required: true
+    discord:
+      method: POST
+      endpoint: /guilds/{guildId}/channels
+      audit_log_reason: "{{ reason }}"
+      body:
+        name: "{{ name }}"
+        type: "{{ type }}"
+        parent_id: "{{ parentId }}"
+        topic: "{{ topic }}"
+        nsfw: "{{ nsfw }}"
+        rate_limit_per_user: "{{ rateLimitPerUser }}"
+      success_status: [201]
+
+  - name: moderation.edit_channel
+    description: Edit a Discord channel. Provide explicit final fields.
+    input_schema:
+      type: object
+      required: [channelId, name, reason]
+      properties:
+        channelId: { type: string }
+        name: { type: string }
+        topic: { type: string }
+        nsfw: { type: boolean }
+        rateLimitPerUser: { type: integer, minimum: 0, maximum: 21600 }
+        parentId: { type: string }
+        reason: { type: string }
+    permissions:
+      user: [ManageChannels]
+      bot: [ManageChannels]
+    safety:
+      confirmation_required: true
+    discord:
+      method: PATCH
+      endpoint: /channels/{channelId}
+      audit_log_reason: "{{ reason }}"
+      body:
+        name: "{{ name }}"
+        topic: "{{ topic }}"
+        nsfw: "{{ nsfw }}"
+        rate_limit_per_user: "{{ rateLimitPerUser }}"
+        parent_id: "{{ parentId }}"
+      success_status: [200]
+
+  - name: moderation.delete_channel
+    description: Delete a Discord channel by ID.
+    input_schema:
+      type: object
+      required: [channelId, reason]
+      properties:
+        channelId: { type: string }
+        reason: { type: string }
+    permissions:
+      user: [ManageChannels]
+      bot: [ManageChannels]
+    safety:
+      confirmation_required: true
+    discord:
+      method: DELETE
+      endpoint: /channels/{channelId}
+      audit_log_reason: "{{ reason }}"
+      success_status: [200]
+
+  - name: moderation.move_member_voice
+    description: Move a member to another voice channel by ID.
+    input_schema:
+      type: object
+      required: [guildId, targetUserId, channelId, reason]
+      properties:
+        guildId: { type: string }
+        targetUserId: { type: string }
+        channelId: { type: string }
+        reason: { type: string }
+    permissions:
+      user: [MoveMembers]
+      bot: [MoveMembers]
+    safety:
+      confirmation_required: false
+    discord:
+      method: PATCH
+      endpoint: /guilds/{guildId}/members/{targetUserId}
+      audit_log_reason: "{{ reason }}"
+      body:
+        channel_id: "{{ channelId }}"
+      success_status: [200]
+
+  - name: moderation.disconnect_member_voice
+    description: Disconnect a member from voice by setting channel_id to null.
+    input_schema:
+      type: object
+      required: [guildId, targetUserId, reason]
+      properties:
+        guildId: { type: string }
+        targetUserId: { type: string }
+        reason: { type: string }
+    permissions:
+      user: [MoveMembers]
+      bot: [MoveMembers]
+    safety:
+      confirmation_required: true
+    discord:
+      method: PATCH
+      endpoint: /guilds/{guildId}/members/{targetUserId}
+      audit_log_reason: "{{ reason }}"
+      body:
+        channel_id: null
+      success_status: [200]
+
+  - name: moderation.set_member_voice_mute
+    description: Server mute or unmute a member in voice.
+    input_schema:
+      type: object
+      required: [guildId, targetUserId, mute, reason]
+      properties:
+        guildId: { type: string }
+        targetUserId: { type: string }
+        mute: { type: boolean }
+        reason: { type: string }
+    permissions:
+      user: [MuteMembers]
+      bot: [MuteMembers]
+    safety:
+      confirmation_required: false
+    discord:
+      method: PATCH
+      endpoint: /guilds/{guildId}/members/{targetUserId}
+      audit_log_reason: "{{ reason }}"
+      body:
+        mute: "{{ mute }}"
+      success_status: [200]
+
+  - name: moderation.set_member_voice_deaf
+    description: Server deafen or undeafen a member in voice.
+    input_schema:
+      type: object
+      required: [guildId, targetUserId, deaf, reason]
+      properties:
+        guildId: { type: string }
+        targetUserId: { type: string }
+        deaf: { type: boolean }
+        reason: { type: string }
+    permissions:
+      user: [DeafenMembers]
+      bot: [DeafenMembers]
+    safety:
+      confirmation_required: false
+    discord:
+      method: PATCH
+      endpoint: /guilds/{guildId}/members/{targetUserId}
+      audit_log_reason: "{{ reason }}"
+      body:
+        deaf: "{{ deaf }}"
+      success_status: [200]
+
+  - name: moderation.preview_prune_members
+    description: Preview how many inactive members would be pruned.
+    input_schema:
+      type: object
+      required: [guildId, days]
+      properties:
+        guildId: { type: string }
+        days: { type: integer, minimum: 1, maximum: 30 }
+    permissions:
+      user: [ManageGuild, KickMembers]
+      bot: [ManageGuild, KickMembers]
+    discord:
+      method: GET
+      endpoint: /guilds/{guildId}/prune?days={days}
+      success_status: [200]
+
+  - name: moderation.prune_members
+    description: Prune inactive guild members. Preview first and require explicit confirmation.
+    input_schema:
+      type: object
+      required: [guildId, days, computePruneCount, reason]
+      properties:
+        guildId: { type: string }
+        days: { type: integer, minimum: 1, maximum: 30 }
+        computePruneCount: { type: boolean }
+        includeRoles:
+          type: array
+          items: { type: string }
+        reason: { type: string }
+    permissions:
+      user: [ManageGuild, KickMembers]
+      bot: [ManageGuild, KickMembers]
+    safety:
+      confirmation_required: true
+      bulk_action: true
+    discord:
+      method: POST
+      endpoint: /guilds/{guildId}/prune
+      audit_log_reason: "{{ reason }}"
+      body:
+        days: "{{ days }}"
+        compute_prune_count: "{{ computePruneCount }}"
+        include_roles: "{{ includeRoles }}"
+      success_status: [200]

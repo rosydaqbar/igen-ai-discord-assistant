@@ -62,7 +62,27 @@ export function validateInput(schema, args) {
     if (rules.type === 'integer' && !Number.isInteger(value)) throw new Error(`${key} must be an integer`);
     if (rules.type === 'number' && typeof value !== 'number') throw new Error(`${key} must be a number`);
     if (rules.type === 'string' && typeof value !== 'string') throw new Error(`${key} must be a string`);
+    if (rules.type === 'boolean' && typeof value !== 'boolean') throw new Error(`${key} must be a boolean`);
+    if (rules.type === 'array') validateArray(key, value, rules);
     if (rules.minimum !== undefined && value < rules.minimum) throw new Error(`${key} must be >= ${rules.minimum}`);
     if (rules.maximum !== undefined && value > rules.maximum) throw new Error(`${key} must be <= ${rules.maximum}`);
+  }
+}
+
+function validateArray(key, value, rules) {
+  if (!Array.isArray(value)) throw new Error(`${key} must be an array`);
+  if (rules.minItems !== undefined && value.length < rules.minItems) {
+    throw new Error(`${key} must have at least ${rules.minItems} items`);
+  }
+  if (rules.maxItems !== undefined && value.length > rules.maxItems) {
+    throw new Error(`${key} must have at most ${rules.maxItems} items`);
+  }
+  if (rules.items?.type) {
+    value.forEach((item, index) => {
+      if (rules.items.type === 'string' && typeof item !== 'string') throw new Error(`${key}[${index}] must be a string`);
+      if (rules.items.type === 'integer' && !Number.isInteger(item)) throw new Error(`${key}[${index}] must be an integer`);
+      if (rules.items.type === 'number' && typeof item !== 'number') throw new Error(`${key}[${index}] must be a number`);
+      if (rules.items.type === 'boolean' && typeof item !== 'boolean') throw new Error(`${key}[${index}] must be a boolean`);
+    });
   }
 }
