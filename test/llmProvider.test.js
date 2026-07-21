@@ -22,6 +22,20 @@ OPENAI_MODEL=openai-model
   assert.deepEqual(providers.map((provider) => provider.name), ['gemini', 'openai']);
 });
 
+test('uses built-in provider endpoints and ignores base URL environment variables', () => {
+  const providers = buildProviderConfigs({
+    OPENAI_API_KEY: 'openai-key',
+    OPENAI_MODEL: 'openai-model',
+    OPENAI_BASE_URL: 'https://wrong.example/v1',
+    GEMINI_API_KEY: 'gemini-key',
+    GEMINI_MODEL: 'gemini-model',
+    GEMINI_BASE_URL: 'https://wrong.example/gemini',
+  }, 'OPENAI_API_KEY=x\nGEMINI_API_KEY=x\n');
+
+  assert.equal(providers[0].baseUrl, 'https://api.openai.com/v1');
+  assert.equal(providers[1].baseUrl, 'https://generativelanguage.googleapis.com/v1beta/openai');
+});
+
 test('falls back to documented order when API keys come from the host environment', () => {
   const providers = buildProviderConfigs({
     OPENROUTER_API_KEY: 'openrouter-key',

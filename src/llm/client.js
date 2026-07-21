@@ -4,7 +4,6 @@ const PROVIDERS = {
   openai: {
     keyEnv: 'OPENAI_API_KEY',
     modelEnv: 'OPENAI_MODEL',
-    baseUrlEnv: 'OPENAI_BASE_URL',
     defaultBaseUrl: 'https://api.openai.com/v1',
     defaultModel: 'gpt-4o-mini',
     endpointKind: 'openai-compatible',
@@ -12,7 +11,6 @@ const PROVIDERS = {
   gemini: {
     keyEnv: 'GEMINI_API_KEY',
     modelEnv: 'GEMINI_MODEL',
-    baseUrlEnv: 'GEMINI_BASE_URL',
     defaultBaseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
     defaultModel: 'gemini-2.0-flash',
     endpointKind: 'openai-compatible',
@@ -20,7 +18,6 @@ const PROVIDERS = {
   claude: {
     keyEnv: 'CLAUDE_API_KEY',
     modelEnv: 'CLAUDE_MODEL',
-    baseUrlEnv: 'CLAUDE_BASE_URL',
     defaultBaseUrl: 'https://api.anthropic.com/v1',
     defaultModel: 'claude-3-5-haiku-latest',
     endpointKind: 'anthropic',
@@ -28,7 +25,6 @@ const PROVIDERS = {
   openrouter: {
     keyEnv: 'OPENROUTER_API_KEY',
     modelEnv: 'OPENROUTER_MODEL',
-    baseUrlEnv: 'OPENROUTER_BASE_URL',
     defaultBaseUrl: 'https://openrouter.ai/api/v1',
     defaultModel: 'openai/gpt-4o-mini',
     endpointKind: 'openai-compatible',
@@ -36,7 +32,6 @@ const PROVIDERS = {
   agentrouter: {
     keyEnv: 'AGENTROUTER_API_KEY',
     modelEnv: 'AGENTROUTER_MODEL',
-    baseUrlEnv: 'AGENTROUTER_BASE_URL',
     defaultBaseUrl: 'https://agentrouter.org/v1',
     defaultModel: 'openai/gpt-4o-mini',
     endpointKind: 'openai-compatible',
@@ -61,13 +56,13 @@ export function buildProviderConfigs(env = process.env, envText = '') {
   const providers = [];
   for (const name of order) {
     const spec = PROVIDERS[name];
-    if (!spec) throw new Error(`Unknown LLM provider in LLM_PROVIDER_ORDER: ${name}`);
+    if (!spec) throw new Error(`Unknown LLM provider: ${name}`);
     const apiKey = env[spec.keyEnv];
     if (!apiKey) continue;
     providers.push({
       name,
       apiKey,
-      baseUrl: env[spec.baseUrlEnv] ?? spec.defaultBaseUrl,
+      baseUrl: spec.defaultBaseUrl,
       model: env[spec.modelEnv] ?? spec.defaultModel,
       endpointKind: spec.endpointKind,
     });

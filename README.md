@@ -61,7 +61,7 @@ Igen supports five providers:
 - OpenRouter
 - AgentRouter
 
-Configure one or more provider blocks in `.env`. Each configured provider needs an API key and model name. Optional base URL variables default to the official/compatible endpoints shown in `.env.example`.
+Configure one or more provider blocks in `.env`. Each configured provider needs an API key and model name. Provider endpoints are built into the runtime, so users do not need to configure base URLs.
 
 ```env
 DISCORD_BOT_TOKEN=replace_with_discord_bot_token
