@@ -45,8 +45,15 @@ Do not use this skill for:
 
 ```text
 skills/
-  discord-moderation.yaml    # data-defined Discord REST moderation skills
-  terminal.yaml              # optional terminal tool definition
+  discord-moderation/
+    core.yaml                 # inspect/list helper skills
+    members.yaml              # timeout/kick/ban/unban skills
+    messages.yaml             # single and bulk message deletion skills
+    roles.yaml                # role create/edit/delete/assign skills
+    channels.yaml             # channel create/edit/delete skills
+    voice.yaml                # voice move/disconnect/mute/deafen skills
+    prune.yaml                # inactive member prune preview/execution skills
+  terminal.yaml               # optional terminal tool definition
 
 src/runtime/
   skillLoader.js             # loads YAML skills and exposes LLM tool schemas
@@ -72,7 +79,7 @@ test/
 ## Core Design Rules
 
 1. **No one-off moderation command files.** Do not add `commands/kick.js`, `commands/timeout.js`, etc.
-2. **Moderation actions are YAML skills.** Add new Discord actions to `skills/discord-moderation.yaml` unless the current runtime cannot express the action.
+2. **Moderation actions are YAML skills.** Add new Discord actions to the matching file under `skills/discord-moderation/` unless the current runtime cannot express the action.
 3. **Runtime code is generic.** JavaScript should improve reusable capabilities: validation, templating, permission checks, hierarchy checks, executors, tool loop, logging, approval UX.
 4. **Discord REST execution happens in Node.** The LLM chooses a skill; the Node runtime validates and calls Discord REST with `DISCORD_BOT_TOKEN`.
 5. **Terminal is optional.** Use terminal tools for host/log/file/admin tasks, not for Discord moderation when a REST skill can do it directly.
@@ -81,7 +88,15 @@ test/
 
 ## Adding a Discord Moderation Skill
 
-Add a YAML item under `skills/discord-moderation.yaml`:
+Add a YAML item under the matching file in `skills/discord-moderation/`:
+
+- `core.yaml`: inspect/list/read-only helpers.
+- `members.yaml`: timeout, kick, ban, unban, member mutation.
+- `messages.yaml`: delete message and bulk-delete message actions.
+- `roles.yaml`: role creation/editing/deletion and role assignment.
+- `channels.yaml`: channel creation/editing/deletion.
+- `voice.yaml`: voice move/disconnect/mute/deafen.
+- `prune.yaml`: inactive member pruning preview/execution.
 
 ```yaml
   - name: moderation.example_action

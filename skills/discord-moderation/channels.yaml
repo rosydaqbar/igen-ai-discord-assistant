@@ -1,0 +1,119 @@
+skills:
+- name: moderation.create_channel
+  description: Create a guild channel. Type follows Discord channel type integers.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - name
+    - type
+    - reason
+    properties:
+      guildId:
+        type: string
+      name:
+        type: string
+      type:
+        type: integer
+        minimum: 0
+      parentId:
+        type: string
+      topic:
+        type: string
+      nsfw:
+        type: boolean
+      rateLimitPerUser:
+        type: integer
+        minimum: 0
+        maximum: 21600
+      reason:
+        type: string
+  permissions:
+    user:
+    - ManageChannels
+    bot:
+    - ManageChannels
+  safety:
+    confirmation_required: true
+  discord:
+    method: POST
+    endpoint: /guilds/{guildId}/channels
+    audit_log_reason: '{{ reason }}'
+    body:
+      name: '{{ name }}'
+      type: '{{ type }}'
+      parent_id: '{{ parentId }}'
+      topic: '{{ topic }}'
+      nsfw: '{{ nsfw }}'
+      rate_limit_per_user: '{{ rateLimitPerUser }}'
+    success_status:
+    - 201
+- name: moderation.edit_channel
+  description: Edit a Discord channel. Provide explicit final fields.
+  input_schema:
+    type: object
+    required:
+    - channelId
+    - name
+    - reason
+    properties:
+      channelId:
+        type: string
+      name:
+        type: string
+      topic:
+        type: string
+      nsfw:
+        type: boolean
+      rateLimitPerUser:
+        type: integer
+        minimum: 0
+        maximum: 21600
+      parentId:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - ManageChannels
+    bot:
+    - ManageChannels
+  safety:
+    confirmation_required: true
+  discord:
+    method: PATCH
+    endpoint: /channels/{channelId}
+    audit_log_reason: '{{ reason }}'
+    body:
+      name: '{{ name }}'
+      topic: '{{ topic }}'
+      nsfw: '{{ nsfw }}'
+      rate_limit_per_user: '{{ rateLimitPerUser }}'
+      parent_id: '{{ parentId }}'
+    success_status:
+    - 200
+- name: moderation.delete_channel
+  description: Delete a Discord channel by ID.
+  input_schema:
+    type: object
+    required:
+    - channelId
+    - reason
+    properties:
+      channelId:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - ManageChannels
+    bot:
+    - ManageChannels
+  safety:
+    confirmation_required: true
+  discord:
+    method: DELETE
+    endpoint: /channels/{channelId}
+    audit_log_reason: '{{ reason }}'
+    success_status:
+    - 200

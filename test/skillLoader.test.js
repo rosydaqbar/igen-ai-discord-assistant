@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
@@ -44,6 +44,17 @@ skills:
       parameters: skill.inputSchema,
     },
   }]);
+});
+
+test('loads YAML skills from nested directories', async () => {
+  const dir = await tempSkillsDir();
+  const nested = path.join(dir, 'discord-moderation');
+  await mkdir(nested);
+  await writeFile(path.join(nested, 'roles.yaml'), 'skills:\n  - name: moderation.create_role\n    description: Create role\n');
+
+  const registry = await loadSkillsFromDir(dir);
+
+  assert.equal(registry.get('moderation.create_role').description, 'Create role');
 });
 
 test('rejects duplicate skill names', async () => {

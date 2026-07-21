@@ -25,7 +25,7 @@ Discord message
   -> final Discord reply
 ```
 
-There are no `kick.js`, `timeout.js`, or per-action command files. Moderation actions live in `skills/discord-moderation.yaml` as data:
+There are no `kick.js`, `timeout.js`, or per-action command files. Moderation actions live in focused YAML files under `skills/discord-moderation/` as data:
 
 - input schema
 - permissions

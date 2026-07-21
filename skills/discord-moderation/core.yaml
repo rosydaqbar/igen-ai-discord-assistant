@@ -1,0 +1,46 @@
+skills:
+- name: moderation.inspect_member
+  description: Fetch a Discord guild member by ID.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - targetUserId
+    properties:
+      guildId:
+        type: string
+      targetUserId:
+        type: string
+  discord:
+    method: GET
+    endpoint: /guilds/{guildId}/members/{targetUserId}
+    success_status:
+    - 200
+- name: moderation.list_bans
+  description: List banned users in a guild, optionally paginated around a user ID.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - limit
+    properties:
+      guildId:
+        type: string
+      limit:
+        type: integer
+        minimum: 1
+        maximum: 1000
+      before:
+        type: string
+      after:
+        type: string
+  permissions:
+    user:
+    - BanMembers
+    bot:
+    - BanMembers
+  discord:
+    method: GET
+    endpoint: /guilds/{guildId}/bans?limit={limit}&before={before}&after={after}
+    success_status:
+    - 200

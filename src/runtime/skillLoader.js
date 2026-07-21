@@ -44,14 +44,27 @@ function normalizeSkill(skill) {
 
 export async function loadSkillsFromDir(dir) {
   const registry = new SkillRegistry();
-  const entries = await readdir(dir, { withFileTypes: true });
-  const files = entries
-    .filter((entry) => entry.isFile() && /\.ya?ml$/i.test(entry.name))
-    .map((entry) => path.join(dir, entry.name));
+  const files = await findYamlFiles(dir);
 
   for (const file of files) {
     const doc = YAML.parse(await readFile(file, 'utf8')) ?? {};
     for (const skill of doc.skills ?? []) registry.add(skill);
   }
   return registry;
+}
+
+async function findYamlFiles(dir) {
+  const entries = await readdir(dir, { withFileTypes: true });
+  const files = [];
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...await findYamlFiles(fullPath));
+      continue;
+    }
+    if (entry.isFile() && /\.ya?ml$/i.test(entry.name)) files.push(fullPath);
+  }
+
+  return files.sort();
 }

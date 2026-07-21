@@ -1,0 +1,130 @@
+skills:
+- name: moderation.move_member_voice
+  description: Move a member to another voice channel by ID.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - targetUserId
+    - channelId
+    - reason
+    properties:
+      guildId:
+        type: string
+      targetUserId:
+        type: string
+      channelId:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - MoveMembers
+    bot:
+    - MoveMembers
+  safety:
+    confirmation_required: false
+  discord:
+    method: PATCH
+    endpoint: /guilds/{guildId}/members/{targetUserId}
+    audit_log_reason: '{{ reason }}'
+    body:
+      channel_id: '{{ channelId }}'
+    success_status:
+    - 200
+- name: moderation.disconnect_member_voice
+  description: Disconnect a member from voice by setting channel_id to null.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - targetUserId
+    - reason
+    properties:
+      guildId:
+        type: string
+      targetUserId:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - MoveMembers
+    bot:
+    - MoveMembers
+  safety:
+    confirmation_required: true
+  discord:
+    method: PATCH
+    endpoint: /guilds/{guildId}/members/{targetUserId}
+    audit_log_reason: '{{ reason }}'
+    body:
+      channel_id: null
+    success_status:
+    - 200
+- name: moderation.set_member_voice_mute
+  description: Server mute or unmute a member in voice.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - targetUserId
+    - mute
+    - reason
+    properties:
+      guildId:
+        type: string
+      targetUserId:
+        type: string
+      mute:
+        type: boolean
+      reason:
+        type: string
+  permissions:
+    user:
+    - MuteMembers
+    bot:
+    - MuteMembers
+  safety:
+    confirmation_required: false
+  discord:
+    method: PATCH
+    endpoint: /guilds/{guildId}/members/{targetUserId}
+    audit_log_reason: '{{ reason }}'
+    body:
+      mute: '{{ mute }}'
+    success_status:
+    - 200
+- name: moderation.set_member_voice_deaf
+  description: Server deafen or undeafen a member in voice.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - targetUserId
+    - deaf
+    - reason
+    properties:
+      guildId:
+        type: string
+      targetUserId:
+        type: string
+      deaf:
+        type: boolean
+      reason:
+        type: string
+  permissions:
+    user:
+    - DeafenMembers
+    bot:
+    - DeafenMembers
+  safety:
+    confirmation_required: false
+  discord:
+    method: PATCH
+    endpoint: /guilds/{guildId}/members/{targetUserId}
+    audit_log_reason: '{{ reason }}'
+    body:
+      deaf: '{{ deaf }}'
+    success_status:
+    - 200

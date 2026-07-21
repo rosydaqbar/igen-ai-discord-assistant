@@ -1,0 +1,161 @@
+skills:
+- name: moderation.timeout
+  description: Timeout a Discord member for a duration in seconds.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - targetUserId
+    - durationSeconds
+    - reason
+    properties:
+      guildId:
+        type: string
+      targetUserId:
+        type: string
+      durationSeconds:
+        type: integer
+        minimum: 1
+        maximum: 2419200
+      reason:
+        type: string
+  permissions:
+    user:
+    - ModerateMembers
+    bot:
+    - ModerateMembers
+  safety:
+    hierarchy: target_member
+    confirmation_required: false
+  discord:
+    method: PATCH
+    endpoint: /guilds/{guildId}/members/{targetUserId}
+    audit_log_reason: '{{ reason }}'
+    body:
+      communication_disabled_until: '{{ timeoutUntilIso(durationSeconds) }}'
+    success_status:
+    - 200
+- name: moderation.remove_timeout
+  description: Remove timeout from a Discord member.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - targetUserId
+    - reason
+    properties:
+      guildId:
+        type: string
+      targetUserId:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - ModerateMembers
+    bot:
+    - ModerateMembers
+  safety:
+    hierarchy: target_member
+    confirmation_required: false
+  discord:
+    method: PATCH
+    endpoint: /guilds/{guildId}/members/{targetUserId}
+    audit_log_reason: '{{ reason }}'
+    body:
+      communication_disabled_until: null
+    success_status:
+    - 200
+- name: moderation.kick
+  description: Kick a Discord member from a guild.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - targetUserId
+    - reason
+    properties:
+      guildId:
+        type: string
+      targetUserId:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - KickMembers
+    bot:
+    - KickMembers
+  safety:
+    hierarchy: target_member
+    confirmation_required: true
+  discord:
+    method: DELETE
+    endpoint: /guilds/{guildId}/members/{targetUserId}
+    audit_log_reason: '{{ reason }}'
+    success_status:
+    - 204
+- name: moderation.ban
+  description: Ban a Discord member from a guild.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - targetUserId
+    - deleteMessageSeconds
+    - reason
+    properties:
+      guildId:
+        type: string
+      targetUserId:
+        type: string
+      deleteMessageSeconds:
+        type: integer
+        minimum: 0
+        maximum: 604800
+      reason:
+        type: string
+  permissions:
+    user:
+    - BanMembers
+    bot:
+    - BanMembers
+  safety:
+    hierarchy: target_member
+    confirmation_required: true
+  discord:
+    method: PUT
+    endpoint: /guilds/{guildId}/bans/{targetUserId}
+    audit_log_reason: '{{ reason }}'
+    body:
+      delete_message_seconds: '{{ deleteMessageSeconds }}'
+    success_status:
+    - 204
+- name: moderation.unban
+  description: Unban a Discord user from a guild.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - targetUserId
+    - reason
+    properties:
+      guildId:
+        type: string
+      targetUserId:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - BanMembers
+    bot:
+    - BanMembers
+  safety:
+    confirmation_required: true
+  discord:
+    method: DELETE
+    endpoint: /guilds/{guildId}/bans/{targetUserId}
+    audit_log_reason: '{{ reason }}'
+    success_status:
+    - 204

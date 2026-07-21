@@ -1,0 +1,66 @@
+skills:
+- name: moderation.delete_message
+  description: Delete one Discord message by channel and message ID.
+  input_schema:
+    type: object
+    required:
+    - channelId
+    - messageId
+    - reason
+    properties:
+      channelId:
+        type: string
+      messageId:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - ManageMessages
+    bot:
+    - ManageMessages
+  safety:
+    confirmation_required: true
+  discord:
+    method: DELETE
+    endpoint: /channels/{channelId}/messages/{messageId}
+    audit_log_reason: '{{ reason }}'
+    success_status:
+    - 204
+- name: moderation.bulk_delete_messages
+  description: Bulk delete 2 to 100 Discord messages from a channel by exact message
+    IDs.
+  input_schema:
+    type: object
+    required:
+    - channelId
+    - messageIds
+    - reason
+    properties:
+      channelId:
+        type: string
+      messageIds:
+        type: array
+        minItems: 2
+        maxItems: 100
+        items:
+          type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - ManageMessages
+    bot:
+    - ManageMessages
+  safety:
+    confirmation_required: true
+    limitations:
+    - Discord rejects bulk deletion for messages older than 14 days.
+  discord:
+    method: POST
+    endpoint: /channels/{channelId}/messages/bulk-delete
+    audit_log_reason: '{{ reason }}'
+    body:
+      messages: '{{ messageIds }}'
+    success_status:
+    - 204

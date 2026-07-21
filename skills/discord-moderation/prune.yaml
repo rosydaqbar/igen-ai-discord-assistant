@@ -1,0 +1,71 @@
+skills:
+- name: moderation.preview_prune_members
+  description: Preview how many inactive members would be pruned.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - days
+    properties:
+      guildId:
+        type: string
+      days:
+        type: integer
+        minimum: 1
+        maximum: 30
+  permissions:
+    user:
+    - ManageGuild
+    - KickMembers
+    bot:
+    - ManageGuild
+    - KickMembers
+  discord:
+    method: GET
+    endpoint: /guilds/{guildId}/prune?days={days}
+    success_status:
+    - 200
+- name: moderation.prune_members
+  description: Prune inactive guild members. Preview first and require explicit confirmation.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - days
+    - computePruneCount
+    - reason
+    properties:
+      guildId:
+        type: string
+      days:
+        type: integer
+        minimum: 1
+        maximum: 30
+      computePruneCount:
+        type: boolean
+      includeRoles:
+        type: array
+        items:
+          type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - ManageGuild
+    - KickMembers
+    bot:
+    - ManageGuild
+    - KickMembers
+  safety:
+    confirmation_required: true
+    bulk_action: true
+  discord:
+    method: POST
+    endpoint: /guilds/{guildId}/prune
+    audit_log_reason: '{{ reason }}'
+    body:
+      days: '{{ days }}'
+      compute_prune_count: '{{ computePruneCount }}'
+      include_roles: '{{ includeRoles }}'
+    success_status:
+    - 200

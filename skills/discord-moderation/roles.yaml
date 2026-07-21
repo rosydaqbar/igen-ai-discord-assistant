@@ -1,0 +1,197 @@
+skills:
+- name: moderation.create_role
+  description: Create a Discord role with explicit permission/color/visibility fields.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - name
+    - permissions
+    - color
+    - hoist
+    - mentionable
+    - reason
+    properties:
+      guildId:
+        type: string
+      name:
+        type: string
+      permissions:
+        type: string
+      color:
+        type: integer
+        minimum: 0
+        maximum: 16777215
+      hoist:
+        type: boolean
+      mentionable:
+        type: boolean
+      reason:
+        type: string
+  permissions:
+    user:
+    - ManageRoles
+    bot:
+    - ManageRoles
+  safety:
+    confirmation_required: true
+    dangerous_permissions_require_confirmation: true
+  discord:
+    method: POST
+    endpoint: /guilds/{guildId}/roles
+    audit_log_reason: '{{ reason }}'
+    body:
+      name: '{{ name }}'
+      permissions: '{{ permissions }}'
+      color: '{{ color }}'
+      hoist: '{{ hoist }}'
+      mentionable: '{{ mentionable }}'
+    success_status:
+    - 200
+- name: moderation.edit_role
+  description: Edit a Discord role. Include exact final role fields only after the
+    user specifies them.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - roleId
+    - name
+    - permissions
+    - color
+    - hoist
+    - mentionable
+    - reason
+    properties:
+      guildId:
+        type: string
+      roleId:
+        type: string
+      name:
+        type: string
+      permissions:
+        type: string
+      color:
+        type: integer
+        minimum: 0
+        maximum: 16777215
+      hoist:
+        type: boolean
+      mentionable:
+        type: boolean
+      reason:
+        type: string
+  permissions:
+    user:
+    - ManageRoles
+    bot:
+    - ManageRoles
+  safety:
+    hierarchy: target_role
+    confirmation_required: true
+    dangerous_permissions_require_confirmation: true
+  discord:
+    method: PATCH
+    endpoint: /guilds/{guildId}/roles/{roleId}
+    audit_log_reason: '{{ reason }}'
+    body:
+      name: '{{ name }}'
+      permissions: '{{ permissions }}'
+      color: '{{ color }}'
+      hoist: '{{ hoist }}'
+      mentionable: '{{ mentionable }}'
+    success_status:
+    - 200
+- name: moderation.delete_role
+  description: Delete a Discord role by ID.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - roleId
+    - reason
+    properties:
+      guildId:
+        type: string
+      roleId:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - ManageRoles
+    bot:
+    - ManageRoles
+  safety:
+    hierarchy: target_role
+    confirmation_required: true
+  discord:
+    method: DELETE
+    endpoint: /guilds/{guildId}/roles/{roleId}
+    audit_log_reason: '{{ reason }}'
+    success_status:
+    - 204
+- name: moderation.add_role_to_member
+  description: Add a role to a Discord guild member.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - targetUserId
+    - roleId
+    - reason
+    properties:
+      guildId:
+        type: string
+      targetUserId:
+        type: string
+      roleId:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - ManageRoles
+    bot:
+    - ManageRoles
+  safety:
+    hierarchy: target_role
+    confirmation_required: false
+  discord:
+    method: PUT
+    endpoint: /guilds/{guildId}/members/{targetUserId}/roles/{roleId}
+    audit_log_reason: '{{ reason }}'
+    success_status:
+    - 204
+- name: moderation.remove_role_from_member
+  description: Remove a role from a Discord guild member.
+  input_schema:
+    type: object
+    required:
+    - guildId
+    - targetUserId
+    - roleId
+    - reason
+    properties:
+      guildId:
+        type: string
+      targetUserId:
+        type: string
+      roleId:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - ManageRoles
+    bot:
+    - ManageRoles
+  safety:
+    hierarchy: target_role
+    confirmation_required: false
+  discord:
+    method: DELETE
+    endpoint: /guilds/{guildId}/members/{targetUserId}/roles/{roleId}
+    audit_log_reason: '{{ reason }}'
+    success_status:
+    - 204
