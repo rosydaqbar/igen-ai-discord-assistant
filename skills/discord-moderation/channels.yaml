@@ -7,7 +7,6 @@ skills:
     - guildId
     - name
     - type
-    - reason
     properties:
       guildId:
         type: string
@@ -55,7 +54,6 @@ skills:
     required:
     - channelId
     - name
-    - reason
     properties:
       channelId:
         type: string
@@ -98,7 +96,6 @@ skills:
     type: object
     required:
     - channelId
-    - reason
     properties:
       channelId:
         type: string

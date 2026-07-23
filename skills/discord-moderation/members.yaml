@@ -7,7 +7,6 @@ skills:
     - guildId
     - targetUserId
     - durationSeconds
-    - reason
     properties:
       guildId:
         type: string
@@ -42,7 +41,6 @@ skills:
     required:
     - guildId
     - targetUserId
-    - reason
     properties:
       guildId:
         type: string
@@ -73,7 +71,6 @@ skills:
     required:
     - guildId
     - targetUserId
-    - reason
     properties:
       guildId:
         type: string
@@ -103,7 +100,6 @@ skills:
     - guildId
     - targetUserId
     - deleteMessageSeconds
-    - reason
     properties:
       guildId:
         type: string
@@ -138,7 +134,6 @@ skills:
     required:
     - guildId
     - targetUserId
-    - reason
     properties:
       guildId:
         type: string

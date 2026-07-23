@@ -7,7 +7,6 @@ skills:
     - guildId
     - targetUserId
     - channelId
-    - reason
     properties:
       guildId:
         type: string
@@ -39,7 +38,6 @@ skills:
     required:
     - guildId
     - targetUserId
-    - reason
     properties:
       guildId:
         type: string
@@ -70,7 +68,6 @@ skills:
     - guildId
     - targetUserId
     - mute
-    - reason
     properties:
       guildId:
         type: string
@@ -103,7 +100,6 @@ skills:
     - guildId
     - targetUserId
     - deaf
-    - reason
     properties:
       guildId:
         type: string

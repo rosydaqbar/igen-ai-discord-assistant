@@ -1,4 +1,5 @@
 import { renderTemplate } from './template.js';
+import { logger } from '../logger.js';
 
 export class SkillExecutor {
   constructor({ registry, permissionChecker, discordRest, terminalExecutor }) {
@@ -31,14 +32,17 @@ export class SkillExecutor {
       path: renderTemplate(skill.discord.endpoint, args),
       body: skill.discord.body === undefined ? undefined : renderTemplate(skill.discord.body, args),
       auditLogReason: skill.discord.audit_log_reason
-        ? renderTemplate(skill.discord.audit_log_reason, args)
+        ? (renderTemplate(skill.discord.audit_log_reason, args) || 'No reason provided')
         : undefined,
     };
+    logger.info(`Discord REST: ${request.method} ${request.path}`);
     const response = await this.discordRest.request(request);
     const expected = skill.discord.success_status ?? [200, 204];
     if (!expected.includes(response.status)) {
+      logger.error(`Discord REST failed: HTTP ${response.status}`);
       throw new Error(`Discord REST failed: HTTP ${response.status}`);
     }
+    logger.info(`Discord REST success: HTTP ${response.status}`);
     return { ok: true, status: response.status, body: response.body ?? null };
   }
 

@@ -7,6 +7,25 @@ export class PermissionChecker {
       }
     }
   }
+
+  getAllowedSkillNames(registry, context) {
+    const perms = context.memberPermissions;
+    if (!perms) return registry.all().map((s) => s.name);
+
+    const allSkills = registry.all();
+    const discordSkills = allSkills.filter((s) => s.discord);
+    const userHasAnyDiscordPerm = discordSkills.some((s) =>
+      (s.permissions?.user ?? []).some((p) => hasPermission(perms, p)),
+    );
+
+    return allSkills.filter((skill) => {
+      if (skill.terminal) return true;
+      if (!userHasAnyDiscordPerm) return false;
+      const required = skill.permissions?.user ?? [];
+      if (required.length === 0) return true;
+      return required.every((p) => hasPermission(perms, p));
+    }).map((s) => s.name);
+  }
 }
 
 function hasPermission(permissions, permission) {

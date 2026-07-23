@@ -33,7 +33,6 @@ skills:
     - guildId
     - days
     - computePruneCount
-    - reason
     properties:
       guildId:
         type: string

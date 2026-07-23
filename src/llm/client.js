@@ -1,3 +1,5 @@
+import { logger } from '../logger.js';
+
 export const DEFAULT_PROVIDER_ORDER = ['openai', 'gemini', 'claude', 'openrouter', 'agentrouter'];
 
 const PROVIDERS = {
@@ -82,12 +84,16 @@ export class MultiProviderLLMClient {
     const errors = [];
     for (const provider of this.providers) {
       try {
+        logger.info(`LLM request: provider=${provider.name} model=${provider.model}`);
         const reply = await this.chatWithProvider(provider, { messages, tools });
+        logger.info(`LLM success: provider=${provider.name} model=${provider.model}`);
         return reply;
       } catch (error) {
+        logger.warn(`LLM error: provider=${provider.name} error=${error.message}`);
         errors.push(`${provider.name}: ${error.message}`);
       }
     }
+    logger.error(`All LLM providers failed: ${errors.join('; ')}`);
     throw new Error(`All LLM providers failed: ${errors.join('; ')}`);
   }
 
@@ -109,6 +115,9 @@ export class MultiProviderLLMClient {
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
+    if (data.usage) {
+      logger.info(`LLM usage: provider=${provider.name} model=${provider.model} prompt_tokens=${data.usage.prompt_tokens} completion_tokens=${data.usage.completion_tokens} total_tokens=${data.usage.total_tokens}`);
+    }
     const message = data.choices?.[0]?.message;
     if (!hasAssistantOutput(message)) throw new Error('response did not contain assistant output');
     return message;
@@ -133,6 +142,9 @@ export class MultiProviderLLMClient {
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
+    if (data.usage) {
+      logger.info(`LLM usage: provider=${provider.name} model=${provider.model} input_tokens=${data.usage.input_tokens} output_tokens=${data.usage.output_tokens}`);
+    }
     const message = fromAnthropicMessage(data);
     if (!hasAssistantOutput(message)) throw new Error('response did not contain assistant output');
     return message;

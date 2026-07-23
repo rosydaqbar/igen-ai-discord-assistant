@@ -10,7 +10,6 @@ skills:
     - color
     - hoist
     - mentionable
-    - reason
     properties:
       guildId:
         type: string
@@ -61,7 +60,6 @@ skills:
     - color
     - hoist
     - mentionable
-    - reason
     properties:
       guildId:
         type: string
@@ -111,7 +109,6 @@ skills:
     - guildId
     - roleId
     - permissions
-    - reason
     properties:
       guildId:
         type: string
@@ -145,7 +142,6 @@ skills:
     required:
     - guildId
     - roleId
-    - reason
     properties:
       guildId:
         type: string
@@ -175,7 +171,6 @@ skills:
     - guildId
     - targetUserId
     - roleId
-    - reason
     properties:
       guildId:
         type: string
@@ -207,7 +202,6 @@ skills:
     - guildId
     - targetUserId
     - roleId
-    - reason
     properties:
       guildId:
         type: string
