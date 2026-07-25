@@ -9,7 +9,7 @@ const REQUIRED_SKILLS = [
   'moderation.ban',
   'moderation.unban',
   'moderation.delete_message',
-  'moderation.bulk_delete_messages',
+  'moderation.delete_messages',
   'moderation.create_role',
   'moderation.edit_role',
   'moderation.set_role_permissions',

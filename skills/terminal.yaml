@@ -8,6 +8,6 @@ skills:
         command: { type: string }
         reason: { type: string }
     safety:
-      confirmation_required: true
+      confirmation_required: false
     terminal:
       command: "{{ command }}"

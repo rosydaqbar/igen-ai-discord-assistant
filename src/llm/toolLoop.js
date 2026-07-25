@@ -138,6 +138,7 @@ function systemPrompt(context = {}) {
     'Use structured skills when a user asks for moderation or terminal actions.',
     'Do not claim an action succeeded until the skill result says ok=true.',
     'Ask for missing IDs, durations, reasons, or approval instead of guessing.',
+    'Format responses using Discord markdown only (supported: **bold**, *italic*, __underline__, ~~strikethrough~~, ||spoiler||, `code`, ```codeblock```, > blockquote, - lists, # headings, -# subtext, timestamps <t:unix:R>, mentions <@id>). Do not use unsupported styles like tables, ---, or ![](images). Keep messages concise.',
   ];
   if (context.guildId) {
     parts.push(`Current guild ID: ${context.guildId}`);
@@ -146,5 +147,19 @@ function systemPrompt(context = {}) {
     parts.push(`Current channel ID: ${context.channelId}`);
   }
   parts.push(`Your caller user ID: ${context.callerUserId ?? 'unknown'}`);
+
+  parts.push(
+    'Every skill has an endpoint of {{path}} — you decide the Discord API path from your training data and the IDs in context.',
+    'Prefer dedicated skills for common actions (they have proper permissions/bodies). Use moderation.discord_get as the catch-all.',
+  );
+  parts.push(
+    'When the user refers to a user, role, channel, or anything by name/nickname (not ID), first use GET/search skills to find it, then use the returned ID in your final path. Do not guess IDs from names.',
+    'Ask the user for confirmation before destructive actions (ban, kick, delete, prune, etc.).',
+    'If you feel confused about the user intent, always ask for clarification. For example, if the user says delete role, it is ambiguous — ask if they mean remove the role from a member or delete the role itself.',
+  );
+
+  const agentNote = 'If the user asks for something you cannot do, and you see Hermes/OpenClaw agent instructions above this prompt, tell them to create a new YAML skill. Otherwise, tell them to install Hermes Agent or OpenClaw and point them to agent-skills/.';
+  parts.push(agentNote);
+
   return parts.join(' ');
 }

@@ -1,16 +1,148 @@
 skills:
-- name: moderation.move_member_voice
-  description: Move a member to another voice channel by ID.
+- name: moderation.deafen_member
+  description: Deafen a Discord member in voice. Pass the path (e.g. /guilds/123/members/456).
   input_schema:
     type: object
     required:
-    - guildId
-    - targetUserId
+    - path
+    properties:
+      path:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - DeafenMembers
+    bot:
+    - DeafenMembers
+  safety:
+    hierarchy: target_member
+    confirmation_required: false
+  discord:
+    method: PATCH
+    endpoint: '{{ path }}'
+    audit_log_reason: '{{ reason }}'
+    body:
+      deaf: true
+    success_status:
+    - 200
+- name: moderation.undeafen_member
+  description: Undeafen a Discord member in voice. Pass the path (e.g. /guilds/123/members/456).
+  input_schema:
+    type: object
+    required:
+    - path
+    properties:
+      path:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - DeafenMembers
+    bot:
+    - DeafenMembers
+  safety:
+    hierarchy: target_member
+    confirmation_required: false
+  discord:
+    method: PATCH
+    endpoint: '{{ path }}'
+    audit_log_reason: '{{ reason }}'
+    body:
+      deaf: false
+    success_status:
+    - 200
+- name: moderation.mute_member
+  description: Server-mute a Discord member in voice. Pass the path (e.g. /guilds/123/members/456).
+  input_schema:
+    type: object
+    required:
+    - path
+    properties:
+      path:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - MuteMembers
+    bot:
+    - MuteMembers
+  safety:
+    hierarchy: target_member
+    confirmation_required: false
+  discord:
+    method: PATCH
+    endpoint: '{{ path }}'
+    audit_log_reason: '{{ reason }}'
+    body:
+      mute: true
+    success_status:
+    - 200
+- name: moderation.unmute_member
+  description: Server-unmute a Discord member in voice. Pass the path (e.g. /guilds/123/members/456).
+  input_schema:
+    type: object
+    required:
+    - path
+    properties:
+      path:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - MuteMembers
+    bot:
+    - MuteMembers
+  safety:
+    hierarchy: target_member
+    confirmation_required: false
+  discord:
+    method: PATCH
+    endpoint: '{{ path }}'
+    audit_log_reason: '{{ reason }}'
+    body:
+      mute: false
+    success_status:
+    - 200
+- name: moderation.disconnect_member
+  description: Disconnect a Discord member from voice channel. Pass the path (e.g. /guilds/123/members/456).
+  input_schema:
+    type: object
+    required:
+    - path
+    properties:
+      path:
+        type: string
+      reason:
+        type: string
+  permissions:
+    user:
+    - MoveMembers
+    bot:
+    - MoveMembers
+  safety:
+    hierarchy: target_member
+    confirmation_required: false
+  discord:
+    method: PATCH
+    endpoint: '{{ path }}'
+    audit_log_reason: '{{ reason }}'
+    body:
+      channel_id: null
+    success_status:
+    - 200
+- name: moderation.move_member
+  description: Move a Discord member to a specific voice channel. Pass the path (e.g. /guilds/123/members/456) and channelId.
+  input_schema:
+    type: object
+    required:
+    - path
     - channelId
     properties:
-      guildId:
-        type: string
-      targetUserId:
+      path:
         type: string
       channelId:
         type: string
@@ -22,105 +154,13 @@ skills:
     bot:
     - MoveMembers
   safety:
+    hierarchy: target_member
     confirmation_required: false
   discord:
     method: PATCH
-    endpoint: /guilds/{guildId}/members/{targetUserId}
+    endpoint: '{{ path }}'
     audit_log_reason: '{{ reason }}'
     body:
       channel_id: '{{ channelId }}'
-    success_status:
-    - 200
-- name: moderation.disconnect_member_voice
-  description: Disconnect a member from voice by setting channel_id to null.
-  input_schema:
-    type: object
-    required:
-    - guildId
-    - targetUserId
-    properties:
-      guildId:
-        type: string
-      targetUserId:
-        type: string
-      reason:
-        type: string
-  permissions:
-    user:
-    - MoveMembers
-    bot:
-    - MoveMembers
-  safety:
-    confirmation_required: true
-  discord:
-    method: PATCH
-    endpoint: /guilds/{guildId}/members/{targetUserId}
-    audit_log_reason: '{{ reason }}'
-    body:
-      channel_id: null
-    success_status:
-    - 200
-- name: moderation.set_member_voice_mute
-  description: Server mute or unmute a member in voice.
-  input_schema:
-    type: object
-    required:
-    - guildId
-    - targetUserId
-    - mute
-    properties:
-      guildId:
-        type: string
-      targetUserId:
-        type: string
-      mute:
-        type: boolean
-      reason:
-        type: string
-  permissions:
-    user:
-    - MuteMembers
-    bot:
-    - MuteMembers
-  safety:
-    confirmation_required: false
-  discord:
-    method: PATCH
-    endpoint: /guilds/{guildId}/members/{targetUserId}
-    audit_log_reason: '{{ reason }}'
-    body:
-      mute: '{{ mute }}'
-    success_status:
-    - 200
-- name: moderation.set_member_voice_deaf
-  description: Server deafen or undeafen a member in voice.
-  input_schema:
-    type: object
-    required:
-    - guildId
-    - targetUserId
-    - deaf
-    properties:
-      guildId:
-        type: string
-      targetUserId:
-        type: string
-      deaf:
-        type: boolean
-      reason:
-        type: string
-  permissions:
-    user:
-    - DeafenMembers
-    bot:
-    - DeafenMembers
-  safety:
-    confirmation_required: false
-  discord:
-    method: PATCH
-    endpoint: /guilds/{guildId}/members/{targetUserId}
-    audit_log_reason: '{{ reason }}'
-    body:
-      deaf: '{{ deaf }}'
     success_status:
     - 200

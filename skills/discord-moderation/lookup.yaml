@@ -1,0 +1,21 @@
+skills:
+- name: moderation.discord_get
+  description: Fallback Discord GET endpoint. Use this when no dedicated skill matches the resource you need. Pass the full path (e.g. /guilds/123/invites or /channels/123/webhooks).
+  input_schema:
+    type: object
+    required:
+    - path
+    properties:
+      path:
+        type: string
+  permissions:
+    user: []
+    bot: []
+  safety:
+    confirmation_required: false
+  discord:
+    method: GET
+    endpoint: '{{ path }}'
+    success_status:
+    - 200
+    - 304

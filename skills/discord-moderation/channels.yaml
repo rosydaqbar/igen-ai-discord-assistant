@@ -1,14 +1,14 @@
 skills:
 - name: moderation.create_channel
-  description: Create a guild channel. Type follows Discord channel type integers.
+  description: Create a guild channel. Pass the path (e.g. /guilds/123/channels) and channel fields.
   input_schema:
     type: object
     required:
-    - guildId
+    - path
     - name
     - type
     properties:
-      guildId:
+      path:
         type: string
       name:
         type: string
@@ -33,10 +33,10 @@ skills:
     bot:
     - ManageChannels
   safety:
-    confirmation_required: true
+    confirmation_required: false
   discord:
     method: POST
-    endpoint: /guilds/{guildId}/channels
+    endpoint: '{{ path }}'
     audit_log_reason: '{{ reason }}'
     body:
       name: '{{ name }}'
@@ -48,14 +48,14 @@ skills:
     success_status:
     - 201
 - name: moderation.edit_channel
-  description: Edit a Discord channel. Provide explicit final fields.
+  description: Edit a Discord channel. Pass the path (e.g. /channels/123) and final fields.
   input_schema:
     type: object
     required:
-    - channelId
+    - path
     - name
     properties:
-      channelId:
+      path:
         type: string
       name:
         type: string
@@ -77,10 +77,10 @@ skills:
     bot:
     - ManageChannels
   safety:
-    confirmation_required: true
+    confirmation_required: false
   discord:
     method: PATCH
-    endpoint: /channels/{channelId}
+    endpoint: '{{ path }}'
     audit_log_reason: '{{ reason }}'
     body:
       name: '{{ name }}'
@@ -91,13 +91,13 @@ skills:
     success_status:
     - 200
 - name: moderation.delete_channel
-  description: Delete a Discord channel by ID.
+  description: Delete a Discord channel. Pass the path (e.g. /channels/123).
   input_schema:
     type: object
     required:
-    - channelId
+    - path
     properties:
-      channelId:
+      path:
         type: string
       reason:
         type: string
@@ -107,10 +107,10 @@ skills:
     bot:
     - ManageChannels
   safety:
-    confirmation_required: true
+    confirmation_required: false
   discord:
     method: DELETE
-    endpoint: /channels/{channelId}
+    endpoint: '{{ path }}'
     audit_log_reason: '{{ reason }}'
     success_status:
     - 200

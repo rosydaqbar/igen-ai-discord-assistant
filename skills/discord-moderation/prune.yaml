@@ -1,13 +1,12 @@
 skills:
-- name: moderation.preview_prune_members
-  description: Preview how many inactive members would be pruned.
+- name: moderation.prune_members_preview
+  description: Preview how many members would be pruned. Pass the path (e.g. /guilds/123/prune).
   input_schema:
     type: object
     required:
-    - guildId
-    - days
+    - path
     properties:
-      guildId:
+      path:
         type: string
       days:
         type: integer
@@ -15,56 +14,48 @@ skills:
         maximum: 30
   permissions:
     user:
-    - ManageGuild
     - KickMembers
     bot:
-    - ManageGuild
     - KickMembers
+  safety:
+    confirmation_required: false
   discord:
     method: GET
-    endpoint: /guilds/{guildId}/prune?days={days}
+    endpoint: '{{ path }}'
+    query:
+      days: '{{ days }}'
     success_status:
     - 200
 - name: moderation.prune_members
-  description: Prune inactive guild members. Preview first and require explicit confirmation.
+  description: Prune (kick) inactive members. Pass the path (e.g. /guilds/123/prune).
   input_schema:
     type: object
     required:
-    - guildId
-    - days
-    - computePruneCount
+    - path
     properties:
-      guildId:
+      path:
         type: string
       days:
         type: integer
         minimum: 1
         maximum: 30
-      computePruneCount:
+      computeOnPruneCount:
         type: boolean
-      includeRoles:
-        type: array
-        items:
-          type: string
       reason:
         type: string
   permissions:
     user:
-    - ManageGuild
     - KickMembers
     bot:
-    - ManageGuild
     - KickMembers
   safety:
-    confirmation_required: true
-    bulk_action: true
+    confirmation_required: false
   discord:
     method: POST
-    endpoint: /guilds/{guildId}/prune
+    endpoint: '{{ path }}'
     audit_log_reason: '{{ reason }}'
     body:
       days: '{{ days }}'
-      compute_prune_count: '{{ computePruneCount }}'
-      include_roles: '{{ includeRoles }}'
+      compute_on_prune_count: '{{ computeOnPruneCount }}'
     success_status:
     - 200

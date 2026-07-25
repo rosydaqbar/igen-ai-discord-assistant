@@ -1,17 +1,17 @@
 skills:
 - name: moderation.create_role
-  description: Create a Discord role with explicit permission/color/visibility fields.
+  description: Create a Discord role. Pass the path (e.g. /guilds/123/roles) and role fields.
   input_schema:
     type: object
     required:
-    - guildId
+    - path
     - name
     - permissions
     - color
     - hoist
     - mentionable
     properties:
-      guildId:
+      path:
         type: string
       name:
         type: string
@@ -33,11 +33,11 @@ skills:
     bot:
     - ManageRoles
   safety:
-    confirmation_required: true
-    dangerous_permissions_require_confirmation: true
+    confirmation_required: false
+    dangerous_permissions_require_confirmation: false
   discord:
     method: POST
-    endpoint: /guilds/{guildId}/roles
+    endpoint: '{{ path }}'
     audit_log_reason: '{{ reason }}'
     body:
       name: '{{ name }}'
@@ -48,22 +48,18 @@ skills:
     success_status:
     - 200
 - name: moderation.edit_role
-  description: Edit a Discord role. Include exact final role fields only after the
-    user specifies them.
+  description: Edit a Discord role. Pass the path (e.g. /guilds/123/roles/456) and final role fields.
   input_schema:
     type: object
     required:
-    - guildId
-    - roleId
+    - path
     - name
     - permissions
     - color
     - hoist
     - mentionable
     properties:
-      guildId:
-        type: string
-      roleId:
+      path:
         type: string
       name:
         type: string
@@ -86,11 +82,11 @@ skills:
     - ManageRoles
   safety:
     hierarchy: target_role
-    confirmation_required: true
-    dangerous_permissions_require_confirmation: true
+    confirmation_required: false
+    dangerous_permissions_require_confirmation: false
   discord:
     method: PATCH
-    endpoint: /guilds/{guildId}/roles/{roleId}
+    endpoint: '{{ path }}'
     audit_log_reason: '{{ reason }}'
     body:
       name: '{{ name }}'
@@ -101,18 +97,14 @@ skills:
     success_status:
     - 200
 - name: moderation.set_role_permissions
-  description: Set a Discord role's full permissions bitfield. Use only after calculating
-    the exact final permissions string.
+  description: Set a Discord role's full permissions bitfield. Pass the path (e.g. /guilds/123/roles/456).
   input_schema:
     type: object
     required:
-    - guildId
-    - roleId
+    - path
     - permissions
     properties:
-      guildId:
-        type: string
-      roleId:
+      path:
         type: string
       permissions:
         type: string
@@ -125,27 +117,24 @@ skills:
     - ManageRoles
   safety:
     hierarchy: target_role
-    confirmation_required: true
-    dangerous_permissions_require_confirmation: true
+    confirmation_required: false
+    dangerous_permissions_require_confirmation: false
   discord:
     method: PATCH
-    endpoint: /guilds/{guildId}/roles/{roleId}
+    endpoint: '{{ path }}'
     audit_log_reason: '{{ reason }}'
     body:
       permissions: '{{ permissions }}'
     success_status:
     - 200
 - name: moderation.delete_role
-  description: Delete a Discord role by ID.
+  description: Delete a Discord role. Pass the path (e.g. /guilds/123/roles/456).
   input_schema:
     type: object
     required:
-    - guildId
-    - roleId
+    - path
     properties:
-      guildId:
-        type: string
-      roleId:
+      path:
         type: string
       reason:
         type: string
@@ -156,27 +145,21 @@ skills:
     - ManageRoles
   safety:
     hierarchy: target_role
-    confirmation_required: true
+    confirmation_required: false
   discord:
     method: DELETE
-    endpoint: /guilds/{guildId}/roles/{roleId}
+    endpoint: '{{ path }}'
     audit_log_reason: '{{ reason }}'
     success_status:
     - 204
 - name: moderation.add_role_to_member
-  description: Add a role to a Discord guild member.
+  description: Add a role to a member. Pass the path (e.g. /guilds/123/members/456/roles/789).
   input_schema:
     type: object
     required:
-    - guildId
-    - targetUserId
-    - roleId
+    - path
     properties:
-      guildId:
-        type: string
-      targetUserId:
-        type: string
-      roleId:
+      path:
         type: string
       reason:
         type: string
@@ -190,24 +173,18 @@ skills:
     confirmation_required: false
   discord:
     method: PUT
-    endpoint: /guilds/{guildId}/members/{targetUserId}/roles/{roleId}
+    endpoint: '{{ path }}'
     audit_log_reason: '{{ reason }}'
     success_status:
     - 204
 - name: moderation.remove_role_from_member
-  description: Remove a role from a Discord guild member.
+  description: Remove a role from a member. Pass the path (e.g. /guilds/123/members/456/roles/789).
   input_schema:
     type: object
     required:
-    - guildId
-    - targetUserId
-    - roleId
+    - path
     properties:
-      guildId:
-        type: string
-      targetUserId:
-        type: string
-      roleId:
+      path:
         type: string
       reason:
         type: string
@@ -221,7 +198,7 @@ skills:
     confirmation_required: false
   discord:
     method: DELETE
-    endpoint: /guilds/{guildId}/members/{targetUserId}/roles/{roleId}
+    endpoint: '{{ path }}'
     audit_log_reason: '{{ reason }}'
     success_status:
     - 204
