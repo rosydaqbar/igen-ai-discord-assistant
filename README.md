@@ -6,6 +6,8 @@ It works as a standalone bot, and it can also be paired with agentic coding tool
 
 The name comes from Japanese-ish "wisdom" energy: the bot should learn/adapt by changing skills and runtime behavior, not by adding one-off command scripts forever.
 
+> **Experimental Jev routing:** on the `feat/jev-api-router` branch, mutating Discord actions can bypass the LLM/YAML execution path. Jev selects a Discord API operation from a central API catalog, then a generic executor resolves exact Discord IDs/values, checks permissions, and calls Discord REST directly. There are no per-action `timeout.js`, `kick.js`, or `ban.js` implementations. See `docs/jev-api-routing.md`.
+
 ## What It Does
 
 - Basic Discord conversation bot using an OpenAI-compatible chat API.
