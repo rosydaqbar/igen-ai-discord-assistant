@@ -237,6 +237,17 @@ client.on('messageCreate', async (message) => {
     }
 
     let allowedSkillNames = permissionChecker.getAllowedSkillNames(registry, context);
+
+    if (jevRouter) {
+      // Jev owns mutating Discord actions. The conversational LLM may still use
+      // read-only Discord GET skills, but it cannot silently execute a mutation
+      // when Jev routing is enabled.
+      allowedSkillNames = allowedSkillNames.filter((name) => {
+        const skill = registry.get(name);
+        return !skill.discord || skill.discord.method === 'GET';
+      });
+    }
+
     if (config.terminalMode === 'off') {
       allowedSkillNames = allowedSkillNames.filter(
         (name) => !name.startsWith('terminal.'),
