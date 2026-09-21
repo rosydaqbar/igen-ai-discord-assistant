@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "operations": [
+    {
+      "id": "discord.modify_guild_member",
+      "description": "PATCH Modify Guild Member. Use when changing a guild member. This initial catalog exposes the communication_disabled_until field for applying or removing a timeout.",
+      "method": "PATCH",
+      "path": "/guilds/{guildId}/members/{targetUserId}",
+      "requiredContext": ["guildId", "targetUserId"],
+      "permissions": {
+        "user": ["ModerateMembers"],
+        "bot": ["ModerateMembers"]
+      },
+      "successStatus": [200],
+      "bodyFields": [
+        {
+          "name": "communication_disabled_until",
+          "description": "ISO-8601 timestamp until which the member cannot communicate. Set null to remove an existing timeout.",
+          "valueType": "relative_datetime_or_null"
+        }
+      ]
+    },
+    {
+      "id": "discord.remove_guild_member",
+      "description": "DELETE Remove Guild Member. Removes a member from the guild without banning them. This is Discord's kick operation.",
+      "method": "DELETE",
+      "path": "/guilds/{guildId}/members/{targetUserId}",
+      "requiredContext": ["guildId", "targetUserId"],
+      "permissions": {
+        "user": ["KickMembers"],
+        "bot": ["KickMembers"]
+      },
+      "successStatus": [204]
+    },
+    {
+      "id": "discord.create_guild_ban",
+      "description": "PUT Create Guild Ban. Bans a user from the guild.",
+      "method": "PUT",
+      "path": "/guilds/{guildId}/bans/{targetUserId}",
+      "requiredContext": ["guildId", "targetUserId"],
+      "permissions": {
+        "user": ["BanMembers"],
+        "bot": ["BanMembers"]
+      },
+      "successStatus": [204],
+      "defaultBody": {
+        "delete_message_seconds": 0
+      }
+    },
+    {
+      "id": "discord.remove_guild_ban",
+      "description": "DELETE Remove Guild Ban. Removes an existing ban for a user.",
+      "method": "DELETE",
+      "path": "/guilds/{guildId}/bans/{targetUserId}",
+      "requiredContext": ["guildId", "targetUserId"],
+      "permissions": {
+        "user": ["BanMembers"],
+        "bot": ["BanMembers"]
+      },
+      "successStatus": [204]
+    }
+  ]
+}
